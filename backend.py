@@ -99,6 +99,36 @@ def init_db():
 def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
 
+
+# ── Pre-seed the 6 Nabha Civil Hospital doctors ────────────
+DOCTOR_SEED = [
+    {"id": "doc-001", "name": "Dr. Rajesh Sharma",  "phone": "9810001001", "specialization": "General Medicine"},
+    {"id": "doc-002", "name": "Dr. Priya Kaur",     "phone": "9810001002", "specialization": "Pediatrics"},
+    {"id": "doc-003", "name": "Dr. Amandeep Singh", "phone": "9810001003", "specialization": "Orthopedics"},
+    {"id": "doc-004", "name": "Dr. Sunita Devi",    "phone": "9810001004", "specialization": "Gynecology"},
+    {"id": "doc-005", "name": "Dr. Vikram Patel",   "phone": "9810001005", "specialization": "Dermatology"},
+    {"id": "doc-006", "name": "Dr. Meena Kumari",   "phone": "9810001006", "specialization": "ENT"},
+]
+
+def seed_doctors():
+    """Insert doctor accounts once at startup — skip if already present."""
+    with app.app_context():
+        db = sqlite3.connect(DB_PATH)
+        for doc in DOCTOR_SEED:
+            existing = db.execute("SELECT id FROM users WHERE id = ?", (doc["id"],)).fetchone()
+            if not existing:
+                db.execute(
+                    "INSERT INTO users (id, name, phone, password_hash, role, village, blood_group, age, created_at) "
+                    "VALUES (?,?,?,?,?,?,?,?,?)",
+                    (doc["id"], doc["name"], doc["phone"],
+                     hash_password("doctor123"), "doctor",
+                     "Nabha Civil Hospital", "", None,
+                     datetime.now().isoformat())
+                )
+                print(f"  ✅ Seeded doctor: {doc['name']} | phone: {doc['phone']} | pwd: doctor123")
+        db.commit()
+        db.close()
+
 # ── Groq helpers ───────────────────────────────────────────
 def groq_chat(system_prompt, user_message):
     chat_completion = client.chat.completions.create(
@@ -229,6 +259,20 @@ def get_appointments(patient_id):
         return jsonify({"error": str(e)}), 500
 
 
+@app.route("/doctor-appointments/<path:doctor_name>", methods=["GET"])
+def get_doctor_appointments(doctor_name):
+    """Return all appointments booked for a specific doctor (used in doctor portal)."""
+    try:
+        db = get_db()
+        rows = db.execute(
+            "SELECT * FROM appointments WHERE doctor_name = ? ORDER BY booked_at DESC",
+            (doctor_name,)
+        ).fetchall()
+        return jsonify({"appointments": [dict(r) for r in rows]})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 # ══════════════════════════════════════════════════════════
 #  HEALTH RECORDS
 # ══════════════════════════════════════════════════════════
@@ -311,26 +355,53 @@ def ask():
 
         output_language = detect(question)
 
-        health_system_prompt = f"""You are Aarogya Mitra AI, a multilingual AI health assistant for rural India.
-You provide accurate health advice, remedies, treatments, and guidance.
-Respond in the same language as the user's query (detected: {output_language}).
-Be thorough but clear. Use simple language that rural users can understand.
-Do NOT use markdown formatting like **, ##, or bullet points with *.
-Use plain text with line breaks to separate sections."""
+        health_system_prompt = f"""You are AarogyaMitra AI, a compassionate multilingual health assistant for rural India (Nabha, Punjab).
+Respond ONLY in the SAME language as the user's query (detected: {output_language}).
+You MUST return a valid JSON object with these exact keys (no extra text, no markdown, just JSON):
 
-        agent_answer = groq_chat(health_system_prompt, question)
-        agent_answer = format_text(remove_markdown(agent_answer))
+{{
+  "urgency": "low" | "medium" | "high" | "emergency",
+  "urgency_message": "one line explanation of urgency in user language",
+  "likely_condition": "Most probable condition name in user language",
+  "symptom_analysis": "2-3 lines explaining what symptoms suggest in user language",
+  "precautions": ["precaution 1", "precaution 2", "precaution 3", ...],
+  "home_remedies": ["remedy 1", "remedy 2", "remedy 3", ...],
+  "dos": ["do 1", "do 2", ...],
+  "donts": ["don't 1", "don't 2", ...],
+  "diet_advice": "brief diet recommendation",
+  "when_to_see_doctor": "specific signs that need immediate professional care",
+  "specialist": "General Medicine" | "Pediatrics" | "Orthopedics" | "Gynecology" | "Dermatology" | "ENT",
+  "summary": "2-line plain language summary for rural patient"
+}}
 
-        summary_system_prompt = f"""You are a medical summary assistant.
-Given a health question and an AI response, create a concise, easy-to-understand summary.
-Respond in language: {output_language}.
-Do NOT use markdown formatting. Use plain text only."""
+Rules:
+- urgency=emergency if chest pain, difficulty breathing, stroke symptoms, or unconsciousness
+- urgency=high if fever >103F, severe pain, blood in urine/stool, or child illness
+- urgency=medium for common infections, moderate pain, persistent symptoms
+- urgency=low for mild symptoms manageable at home
+- Give at least 4 precautions and 3 home remedies
+- All content must be in {output_language} language
+- Return ONLY valid JSON, no other text"""
 
-        summary_query = f"Question: {question}\n\nResponse: {agent_answer}\n\nProvide a concise summary of the above response."
-        summary = groq_chat(summary_system_prompt, summary_query)
-        summary = format_text(remove_markdown(summary))
+        raw = groq_chat(health_system_prompt, question)
 
-        return jsonify({"response": agent_answer, "summary": summary})
+        # Extract JSON from the response
+        import json as json_lib
+        try:
+            # Strip any accidental markdown
+            clean = re.sub(r'```json|```', '', raw).strip()
+            structured = json_lib.loads(clean)
+        except Exception:
+            # Fallback: return as plain text
+            structured = None
+
+        if structured:
+            return jsonify({"structured": structured, "response": structured.get("summary", raw), "summary": raw})
+        else:
+            # Legacy fallback
+            agent_answer = format_text(remove_markdown(raw))
+            return jsonify({"response": agent_answer, "summary": agent_answer})
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -410,4 +481,9 @@ Do NOT use markdown formatting."""
 # ── Boot ───────────────────────────────────────────────────
 if __name__ == "__main__":
     init_db()
+    seed_doctors()
+    print("\n🩺 Doctor login credentials:")
+    for doc in DOCTOR_SEED:
+        print(f"   {doc['name']:30s}  phone: {doc['phone']}  password: doctor123")
+    print()
     app.run(debug=True, port=5000)

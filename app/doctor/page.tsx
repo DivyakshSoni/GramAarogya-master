@@ -2,18 +2,11 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Video, Phone, Calendar, Clock, User, Stethoscope, LogOut, RefreshCw } from "lucide-react"
+import { Video, Phone, Calendar, Clock, Stethoscope, LogOut, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Navbar from "@/components/navbar"
 
 const API = "http://127.0.0.1:5000"
-
-// Demo appointments shown when no DB data (for hackathon demo without backend)
-const DEMO_APPOINTMENTS = [
-  { id: "demo-1", patient_name: "Ramesh Kumar",   symptoms: "Fever and cough for 3 days", day: "Thursday", time: "10:00 AM", status: "Scheduled", doctor_name: "Dr. Rajesh Sharma",  specialization: "General Medicine" },
-  { id: "demo-2", patient_name: "Sunita Devi",    symptoms: "Chest congestion",           day: "Thursday", time: "11:00 AM", status: "Scheduled", doctor_name: "Dr. Priya Kaur",     specialization: "Pediatrics" },
-  { id: "demo-3", patient_name: "Gurpreet Singh", symptoms: "Knee pain",                  day: "Thursday", time: "02:00 PM", status: "Scheduled", doctor_name: "Dr. Rajesh Sharma",  specialization: "General Medicine" },
-]
 
 interface Appointment {
   id: string
@@ -44,29 +37,34 @@ export default function DoctorPortal() {
   const [inCall, setInCall] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
 
+  const [authChecked, setAuthChecked] = useState(false)
+
   useEffect(() => {
     const sessionRaw = localStorage.getItem("gramaarogya_user")
-    if (sessionRaw) {
-      const u = JSON.parse(sessionRaw)
-      setDoctor({ name: u.name, id: u.id, specialization: u.specialization })
 
-      fetch(`${API}/appointments/${u.id}`)
-        .then(r => r.json())
-        .then(data => {
-          if (data.appointments?.length > 0) {
-            setAppointments(data.appointments)
-          } else {
-            setAppointments(DEMO_APPOINTMENTS)
-          }
-        })
-        .catch(() => setAppointments(DEMO_APPOINTMENTS))
-        .finally(() => setLoading(false))
-    } else {
-      // Not logged in — show demo as guest doctor
-      setDoctor({ name: "Dr. Rajesh Sharma", id: "demo", specialization: "General Medicine" })
-      setAppointments(DEMO_APPOINTMENTS)
-      setLoading(false)
+    // No session at all → go to login
+    if (!sessionRaw) {
+      router.replace("/login")
+      return
     }
+
+    const u = JSON.parse(sessionRaw)
+
+    // Logged in as patient → wrong portal, redirect
+    if (u.role !== "doctor") {
+      router.replace("/health-check")
+      return
+    }
+
+    // ✅ Confirmed doctor — fetch only their appointments by name
+    setDoctor({ name: u.name, id: u.id, specialization: u.specialization })
+    setAuthChecked(true)
+
+    fetch(`${API}/doctor-appointments/${encodeURIComponent(u.name)}`)
+      .then(r => r.json())
+      .then(data => setAppointments(data.appointments || []))
+      .catch(() => setAppointments([]))
+      .finally(() => setLoading(false))
   }, [])
 
   const refresh = async () => {
@@ -75,10 +73,10 @@ export default function DoctorPortal() {
     if (sessionRaw) {
       const u = JSON.parse(sessionRaw)
       try {
-        const r = await fetch(`${API}/appointments/${u.id}`)
+        const r = await fetch(`${API}/doctor-appointments/${encodeURIComponent(u.name)}`)
         const data = await r.json()
-        setAppointments(data.appointments?.length > 0 ? data.appointments : DEMO_APPOINTMENTS)
-      } catch { setAppointments(DEMO_APPOINTMENTS) }
+        setAppointments(data.appointments || [])
+      } catch { setAppointments([]) }
     }
     setRefreshing(false)
   }
@@ -132,6 +130,15 @@ export default function DoctorPortal() {
   }
 
   // ── Main portal ────────────────────────────────────────
+  // Don't render anything until auth is confirmed (prevents flash before redirect)
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <p className="text-gray-500 text-sm">Verifying access...</p>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-black text-white">
       <Navbar />
@@ -215,7 +222,20 @@ export default function DoctorPortal() {
                     🔗 meet.jit.si/{room}
                   </div>
 
-                  {/* Join buttons */}
+                  {/* WhatsApp Patient — doctor sends pre-written message */}
+                  <div className="mb-3">
+                    <button
+                      onClick={() => {
+                        const msg = `Namaste ${appt.patient_name} ji! 🙏\n\nYour teleconsultation with ${doctor?.name} (${appt.specialization}) is confirmed for ${appt.day} at ${appt.time}.\n\nPlease click the link below at your appointment time to join the video call:\n👉 https://meet.jit.si/${room}\n\n— Nabha Civil Hospital, GramAarogya`
+                        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank")
+                      }}
+                      className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-500 text-white py-2.5 rounded-lg font-semibold text-sm"
+                    >
+                      📱 WhatsApp Patient (Send Call Link)
+                    </button>
+                  </div>
+
+                  {/* Join buttons — doctor only */}
                   <div className="flex gap-2">
                     <Button
                       onClick={() => joinCall(appt, "video")}
@@ -225,7 +245,7 @@ export default function DoctorPortal() {
                     </Button>
                     <Button
                       onClick={() => joinCall(appt, "audio")}
-                      className="flex-1 bg-green-600 hover:bg-green-500 text-white py-2.5 rounded-lg font-semibold flex items-center justify-center gap-2"
+                      className="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-2.5 rounded-lg font-semibold flex items-center justify-center gap-2"
                     >
                       <Phone size={16} /> Audio Only
                     </Button>

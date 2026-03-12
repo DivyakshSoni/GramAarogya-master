@@ -5,6 +5,7 @@ import type { Metadata, Viewport } from "next"
 import MouseMoveEffect from "@/components/mouse-move-effect"
 import ServiceWorkerRegistration from "@/components/sw-register"
 import EmergencySOS from "@/components/emergency-sos"
+import ChatBot from "@/components/chat-bot"
 import { LangProvider } from "@/components/lang-context"
 import "leaflet/dist/leaflet.css"
 
@@ -42,6 +43,7 @@ export default function RootLayout({
       <body className={`${inter.className} bg-background text-foreground antialiased`}>
         <LangProvider>
           <ServiceWorkerRegistration />
+          <ChatBot />
           <EmergencySOS />
           <MouseMoveEffect />
           {children}

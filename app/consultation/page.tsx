@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
-import { Video, Phone, Calendar, Clock, Star, User, ChevronRight, FileText, Printer, Copy, ExternalLink } from "lucide-react"
+import { Video, Phone, Calendar, Clock, Star, User, ChevronRight, FileText, Printer, Copy } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 
@@ -62,7 +62,6 @@ export default function Consultation() {
     if (!selectedDoctor || !selectedDay || !selectedTime || !patientName || !patientPhone) return
     setBookingConfirmed(true)
 
-    // Save appointment to localStorage for health records
     const appointment = {
       id: Date.now(),
       doctorName: selectedDoctor.name,
@@ -76,9 +75,29 @@ export default function Consultation() {
       status: "Scheduled",
       bookedAt: new Date().toISOString(),
     }
+
+    // Save to localStorage (offline fallback)
     const existingAppointments = JSON.parse(localStorage.getItem("appointments") || "[]")
     existingAppointments.push(appointment)
     localStorage.setItem("appointments", JSON.stringify(existingAppointments))
+
+    // Save to SQLite backend so it appears in the doctor's portal
+    const session = localStorage.getItem("gramaarogya_user")
+    const patientId = session ? JSON.parse(session).id : "guest"
+    fetch("http://127.0.0.1:5000/appointments", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        patientId,
+        patientName,
+        doctorName: selectedDoctor.name,
+        specialization: selectedDoctor.specialization,
+        hospital: selectedDoctor.hospital,
+        day: selectedDay,
+        time: selectedTime,
+        symptoms,
+      }),
+    }).catch(() => { /* offline — localStorage already saved */ })
   }
 
   const startCall = (type: "video" | "audio") => {
@@ -270,73 +289,78 @@ export default function Consultation() {
           {bookingConfirmed && selectedDoctor ? (
             <div className="max-w-lg mx-auto">
               <div className="bg-gray-900 rounded-xl p-6 border border-gray-700 text-center mb-6">
-                <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-3xl">✅</span>
+                <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-4xl">✅</span>
                 </div>
-                <h2 className="text-xl font-bold mb-2">Appointment Booked!</h2>
-                <p className="text-gray-400 mb-4">Your consultation is scheduled</p>
+                <h2 className="text-2xl font-bold mb-1">Appointment Booked!</h2>
+                <p className="text-gray-400 mb-6">Your slot is confirmed at Nabha Civil Hospital</p>
 
-                <div className="bg-gray-800 rounded-lg p-4 text-left space-y-2 mb-6">
-                  <p><span className="text-gray-400">Doctor:</span> <span className="font-medium">{selectedDoctor.name}</span></p>
-                  <p><span className="text-gray-400">Specialization:</span> <span>{selectedDoctor.specialization}</span></p>
-                  <p><span className="text-gray-400">Day:</span> <span>{selectedDay}</span></p>
-                  <p><span className="text-gray-400">Time:</span> <span>{selectedTime}</span></p>
-                  <p><span className="text-gray-400">Patient:</span> <span>{patientName}</span></p>
-                  <p><span className="text-gray-400">Fee:</span> <span className="text-green-400">{selectedDoctor.fee}</span></p>
-                </div>
-
-                {/* Share with Doctor */}
-                <div className="bg-blue-900/20 border border-blue-700 rounded-lg p-4 mb-2">
-                  <p className="text-blue-300 text-sm font-medium mb-2">📎 Share this link with the doctor to join:</p>
-                  <p className="text-xs text-gray-400 break-all mb-3 font-mono bg-gray-800 px-2 py-1.5 rounded">{getJitsiLink()}</p>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => { navigator.clipboard.writeText(getJitsiLink()); alert("Link copied!") }}
-                      className="flex-1 flex items-center justify-center gap-1.5 text-sm bg-gray-700 hover:bg-gray-600 text-white py-2 rounded-lg"
-                    >
-                      <Copy size={14} /> Copy Link
-                    </button>
-                    <button
-                      onClick={() => window.open(getJitsiLink(), "_blank")}
-                      className="flex-1 flex items-center justify-center gap-1.5 text-sm bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-lg"
-                    >
-                      <ExternalLink size={14} /> Open as Doctor
-                    </button>
+                {/* Appointment details */}
+                <div className="bg-gray-800 rounded-xl p-4 text-left space-y-3 mb-6">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-400">Doctor</span>
+                    <span className="font-semibold">{selectedDoctor.name}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-400">Specialization</span>
+                    <span>{selectedDoctor.specialization}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-400">Day & Time</span>
+                    <span>{selectedDay} at {selectedTime}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-400">Patient</span>
+                    <span>{patientName}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-400">Phone</span>
+                    <span>{patientPhone}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-400">Consultation Fee</span>
+                    <span className="text-green-400 font-semibold">{selectedDoctor.fee}</span>
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <Button
-                    onClick={() => startCall("video")}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2"
-                  >
-                    <Video size={20} /> Start Video Call
-                  </Button>
-                  <Button
-                    onClick={() => startCall("audio")}
-                    className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2"
-                  >
-                    <Phone size={20} /> Audio Call
-                  </Button>
+                {/* What happens next */}
+                <div className="bg-blue-900/20 border border-blue-700/50 rounded-xl p-4 text-left mb-6">
+                  <p className="text-blue-300 font-semibold text-sm mb-3">📲 What happens next?</p>
+                  <div className="space-y-2 text-sm text-gray-300">
+                    <div className="flex items-start gap-2">
+                      <span className="text-green-400 mt-0.5">1.</span>
+                      <p>The doctor will review your appointment and symptoms.</p>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-green-400 mt-0.5">2.</span>
+                      <p><strong>{selectedDoctor.name}</strong> will send you a <strong>WhatsApp message</strong> with the video call link on <strong>{patientPhone}</strong>.</p>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-green-400 mt-0.5">3.</span>
+                      <p>Click the link at your scheduled time to join the teleconsultation.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-yellow-900/20 border border-yellow-700/40 rounded-lg p-3 text-xs text-yellow-300 mb-6">
+                  ⏰ Please be available on WhatsApp at <strong>{selectedTime} on {selectedDay}</strong>
                 </div>
 
                 <Button
                   onClick={() => {
                     setBookingConfirmed(false)
                     setSelectedDoctor(null)
-                    setSelectedDay("")
-                    setSelectedTime("")
-                    setPatientName("")
-                    setPatientPhone("")
-                    setSymptoms("")
+                    setSelectedDay(""); setSelectedTime("")
+                    setPatientName(""); setPatientPhone(""); setSymptoms("")
                   }}
                   variant="outline"
-                  className="mt-4 w-full"
+                  className="w-full"
                 >
-                  Book Another Consultation
+                  Book Another Appointment
                 </Button>
               </div>
             </div>
+
           ) : selectedDoctor ? (
             /* Booking Form */
             <div className="max-w-lg mx-auto">
