@@ -100,14 +100,19 @@ def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
 
 
-# ── Pre-seed the 6 Nabha Civil Hospital doctors ────────────
+# ── Pre-seed 11 Nabha Civil Hospital doctors (matches PS: 11/23 posts filled) ──
 DOCTOR_SEED = [
-    {"id": "doc-001", "name": "Dr. Rajesh Sharma",  "phone": "9810001001", "specialization": "General Medicine"},
-    {"id": "doc-002", "name": "Dr. Priya Kaur",     "phone": "9810001002", "specialization": "Pediatrics"},
-    {"id": "doc-003", "name": "Dr. Amandeep Singh", "phone": "9810001003", "specialization": "Orthopedics"},
-    {"id": "doc-004", "name": "Dr. Sunita Devi",    "phone": "9810001004", "specialization": "Gynecology"},
-    {"id": "doc-005", "name": "Dr. Vikram Patel",   "phone": "9810001005", "specialization": "Dermatology"},
-    {"id": "doc-006", "name": "Dr. Meena Kumari",   "phone": "9810001006", "specialization": "ENT"},
+    {"id": "doc-001", "name": "Dr. Rajesh Sharma",    "phone": "9810001001", "specialization": "General Medicine"},
+    {"id": "doc-002", "name": "Dr. Priya Kaur",       "phone": "9810001002", "specialization": "Pediatrics"},
+    {"id": "doc-003", "name": "Dr. Amandeep Singh",   "phone": "9810001003", "specialization": "Orthopedics"},
+    {"id": "doc-004", "name": "Dr. Sunita Devi",      "phone": "9810001004", "specialization": "Gynecology"},
+    {"id": "doc-005", "name": "Dr. Vikram Patel",     "phone": "9810001005", "specialization": "Dermatology"},
+    {"id": "doc-006", "name": "Dr. Meena Kumari",     "phone": "9810001006", "specialization": "ENT"},
+    {"id": "doc-007", "name": "Dr. Harpreet Singh",   "phone": "9810001007", "specialization": "Cardiology"},
+    {"id": "doc-008", "name": "Dr. Ranjit Kaur",      "phone": "9810001008", "specialization": "Ophthalmology"},
+    {"id": "doc-009", "name": "Dr. Suresh Kumar",     "phone": "9810001009", "specialization": "Psychiatry"},
+    {"id": "doc-010", "name": "Dr. Anjali Mishra",    "phone": "9810001010", "specialization": "Radiology"},
+    {"id": "doc-011", "name": "Dr. Balwinder Singh",  "phone": "9810001011", "specialization": "Neurology"},
 ]
 
 def seed_doctors():

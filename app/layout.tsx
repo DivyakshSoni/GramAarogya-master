@@ -12,14 +12,14 @@ import "leaflet/dist/leaflet.css"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "GramAarogya - Rural TeleHealth Access System",
+  title: "GramCare - Rural TeleHealth Access System",
   description: "AI-powered healthcare platform bridging the gap between rural communities and quality medical support.",
   generator: 'v0.dev',
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "GramAarogya",
+    title: "GramCare",
   },
 }
 
@@ -36,7 +36,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" suppressHydrationWarning>
       <head>
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>

@@ -6,12 +6,12 @@ import { ChevronDown, ChevronUp } from "lucide-react"
 import { useLang } from "@/components/lang-context"
 
 const translations = [
-  { lang: "English", text: "GramAarogya" },
-  { lang: "हिन्दी", text: "ग्रामआरोग्य" },
-  { lang: "ગુજરાતી", text: "ગ્રામઆરોગ્ય" },
-  { lang: "বাংলা", text: "গ্রামআরোগ্য" },
-  { lang: "मराठी", text: "ग्रामआरोग्य" },
-  { lang: "தமிழ்", text: "கிராமாரோக்கிய" },
+  { lang: "English", text: "GramCare" },
+  { lang: "हिन्दी", text: "ग्रामकेयर" },
+  { lang: "ગુજરાતી", text: "ગ્રામકેર" },
+  { lang: "বাংলা", text: "গ্রামকেয়ার" },
+  { lang: "मराठी", text: "ग्रामकेयर" },
+  { lang: "தமிழ்", text: "கிராம் கேர்" },
 ]
 
 const greetings = [

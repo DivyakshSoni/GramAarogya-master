@@ -6,7 +6,7 @@ export default function Footer() {
     <footer className="border-t">
       <div className="container flex flex-col gap-8 py-8 md:flex-row md:py-12">
         <div className="flex-1 space-y-4">
-          <h2 className="font-bold">GramAarogya</h2>
+          <h2 className="font-bold">GramCare</h2>
           <p className="text-sm text-muted-foreground">Revolutionizing Rural Healthcare</p>
         </div>
         <div className="grid flex-1 grid-cols-2 gap-12 sm:grid-cols-3">
@@ -73,7 +73,7 @@ export default function Footer() {
       </div>
       <div className="container border-t py-6">
         <p className="text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} GramAarogya
+          © {new Date().getFullYear()} GramCare
         </p>
       </div>
     </footer>

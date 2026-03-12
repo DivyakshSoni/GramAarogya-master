@@ -65,7 +65,7 @@ export default function ImpactDashboard() {
           <div className="inline-flex items-center gap-2 bg-green-900/30 border border-green-800/50 rounded-full px-4 py-1 text-green-300 text-sm mb-4">
             <Activity size={14} className="animate-pulse" /> Live Impact — Updated Today
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold mb-2">🌿 GramAarogya Impact</h1>
+          <h1 className="text-3xl sm:text-4xl font-extrabold mb-2">🌿 GramCare Impact</h1>
           <p className="text-gray-400 text-sm sm:text-base max-w-2xl mx-auto">
             Real-world impact of bringing digital healthcare to 173 rural villages around Nabha Civil Hospital, Punjab.
           </p>
@@ -150,7 +150,7 @@ export default function ImpactDashboard() {
 
           {/* CTA */}
           <div className="bg-gradient-to-r from-blue-900/30 to-green-900/20 border border-blue-900/50 rounded-xl p-6 text-center">
-            <h3 className="text-lg font-bold mb-2">Ready to Experience GramAarogya?</h3>
+            <h3 className="text-lg font-bold mb-2">Ready to Experience GramCare?</h3>
             <p className="text-gray-400 text-sm mb-4">Join thousands of rural patients getting better healthcare access.</p>
             <div className="flex flex-wrap gap-2 justify-center">
               <Link href="/consultation">

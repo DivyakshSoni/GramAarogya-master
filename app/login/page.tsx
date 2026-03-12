@@ -87,7 +87,7 @@ export default function LoginPage() {
               <Heart size={32} className="text-white fill-white" />
             </div>
           </div>
-          <h1 className="text-3xl font-extrabold text-white mb-1">GramAarogya</h1>
+          <h1 className="text-3xl font-extrabold text-white mb-1">GramCare</h1>
           <p className="text-gray-400 text-sm mb-10">Rural TeleHealth Access System</p>
 
           <p className="text-gray-300 font-medium mb-4">I am a...</p>

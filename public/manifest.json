@@ -1,6 +1,6 @@
 {
-  "name": "GramAarogya - Rural TeleHealth",
-  "short_name": "GramAarogya",
+  "name": "GramCare - Rural TeleHealth",
+  "short_name": "GramCare",
   "description": "AI-powered healthcare platform for rural India. Consult doctors, check symptoms, find medicines — works offline.",
   "start_url": "/",
   "display": "standalone",

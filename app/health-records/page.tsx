@@ -142,14 +142,10 @@ export default function HealthRecords() {
       return // skip localStorage-only path below
     }
 
-    // No login session — use localStorage only (offline / unregistered)
-    const savedProfile = localStorage.getItem("patientProfile")
-    if (savedProfile) { setProfile(JSON.parse(savedProfile)); setIsRegistered(true) }
-    const savedRecords = localStorage.getItem("healthRecords")
-    if (savedRecords) setRecords(JSON.parse(savedRecords))
-    const savedAppointments = localStorage.getItem("appointments")
-    if (savedAppointments) setAppointments(JSON.parse(savedAppointments))
-  }, [])
+    // No valid login session — clear stale data and redirect to login
+    localStorage.removeItem("patientProfile")
+    router.replace("/login")
+  }, [router])
 
   const handleRegister = () => {
     if (!regName || !regAge || !regPhone || !regVillage) return

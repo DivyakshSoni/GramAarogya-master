@@ -23,12 +23,17 @@ interface Doctor {
 }
 
 const doctors: Doctor[] = [
-  { id: 1, name: "Dr. Rajesh Sharma",  specialization: "General Medicine", experience: "15 years", available: true,  availableDays: ["Monday","Wednesday","Friday"],         timeSlots: ["09:00 AM","10:00 AM","11:00 AM","02:00 PM","03:00 PM"], rating: 4.8, hospital: "Nabha Civil Hospital", fee: "₹200", image: "👨‍⚕️", queue: 3 },
-  { id: 2, name: "Dr. Priya Kaur",     specialization: "Pediatrics",       experience: "10 years", available: true,  availableDays: ["Tuesday","Thursday","Saturday"],        timeSlots: ["10:00 AM","11:00 AM","12:00 PM","03:00 PM","04:00 PM"], rating: 4.9, hospital: "Nabha Civil Hospital", fee: "₹250", image: "👩‍⚕️", queue: 1 },
-  { id: 3, name: "Dr. Amandeep Singh", specialization: "Orthopedics",      experience: "12 years", available: false, availableDays: ["Monday","Thursday"],                    timeSlots: ["09:00 AM","10:00 AM","02:00 PM"],              rating: 4.6, hospital: "Nabha Civil Hospital", fee: "₹300", image: "👨‍⚕️", queue: 0 },
-  { id: 4, name: "Dr. Sunita Devi",    specialization: "Gynecology",       experience: "18 years", available: true,  availableDays: ["Monday","Tuesday","Wednesday","Friday"], timeSlots: ["09:00 AM","10:00 AM","11:00 AM","01:00 PM","02:00 PM"], rating: 4.7, hospital: "Nabha Civil Hospital", fee: "₹250", image: "👩‍⚕️", queue: 5 },
-  { id: 5, name: "Dr. Vikram Patel",   specialization: "Dermatology",      experience: "8 years",  available: true,  availableDays: ["Wednesday","Friday","Saturday"],         timeSlots: ["10:00 AM","11:00 AM","03:00 PM","04:00 PM"],             rating: 4.5, hospital: "Nabha Civil Hospital", fee: "₹200", image: "👨‍⚕️", queue: 0 },
-  { id: 6, name: "Dr. Meena Kumari",   specialization: "ENT",              experience: "14 years", available: true,  availableDays: ["Tuesday","Thursday","Saturday"],         timeSlots: ["09:00 AM","11:00 AM","02:00 PM","04:00 PM"],             rating: 4.8, hospital: "Nabha Civil Hospital", fee: "₹200", image: "👩‍⚕️", queue: 2 },
+  { id: 1,  name: "Dr. Rajesh Sharma",    specialization: "General Medicine",  experience: "15 years", available: true,  availableDays: ["Monday","Wednesday","Friday"],           timeSlots: ["09:00 AM","10:00 AM","11:00 AM","02:00 PM","03:00 PM"], rating: 4.8, hospital: "Nabha Civil Hospital", fee: "₹200", image: "👨‍⚕️", queue: 3 },
+  { id: 2,  name: "Dr. Priya Kaur",       specialization: "Pediatrics",         experience: "10 years", available: true,  availableDays: ["Tuesday","Thursday","Saturday"],          timeSlots: ["10:00 AM","11:00 AM","12:00 PM","03:00 PM","04:00 PM"], rating: 4.9, hospital: "Nabha Civil Hospital", fee: "₹250", image: "👩‍⚕️", queue: 1 },
+  { id: 3,  name: "Dr. Amandeep Singh",   specialization: "Orthopedics",        experience: "12 years", available: false, availableDays: ["Monday","Thursday"],                      timeSlots: ["09:00 AM","10:00 AM","02:00 PM"],                       rating: 4.6, hospital: "Nabha Civil Hospital", fee: "₹300", image: "👨‍⚕️", queue: 0 },
+  { id: 4,  name: "Dr. Sunita Devi",      specialization: "Gynecology",         experience: "18 years", available: true,  availableDays: ["Monday","Tuesday","Wednesday","Friday"],  timeSlots: ["09:00 AM","10:00 AM","11:00 AM","01:00 PM","02:00 PM"], rating: 4.7, hospital: "Nabha Civil Hospital", fee: "₹250", image: "👩‍⚕️", queue: 5 },
+  { id: 5,  name: "Dr. Vikram Patel",     specialization: "Dermatology",        experience: "8 years",  available: true,  availableDays: ["Wednesday","Friday","Saturday"],           timeSlots: ["10:00 AM","11:00 AM","03:00 PM","04:00 PM"],             rating: 4.5, hospital: "Nabha Civil Hospital", fee: "₹200", image: "👨‍⚕️", queue: 0 },
+  { id: 6,  name: "Dr. Meena Kumari",     specialization: "ENT",                experience: "14 years", available: true,  availableDays: ["Tuesday","Thursday","Saturday"],           timeSlots: ["09:00 AM","11:00 AM","02:00 PM","04:00 PM"],             rating: 4.8, hospital: "Nabha Civil Hospital", fee: "₹200", image: "👩‍⚕️", queue: 2 },
+  { id: 7,  name: "Dr. Harpreet Singh",   specialization: "Cardiology",         experience: "20 years", available: true,  availableDays: ["Monday","Wednesday","Friday"],             timeSlots: ["09:00 AM","11:00 AM","02:00 PM","04:00 PM"],             rating: 4.9, hospital: "Nabha Civil Hospital", fee: "₹350", image: "👨‍⚕️", queue: 4 },
+  { id: 8,  name: "Dr. Ranjit Kaur",      specialization: "Ophthalmology",      experience: "11 years", available: true,  availableDays: ["Tuesday","Thursday","Saturday"],           timeSlots: ["10:00 AM","11:00 AM","03:00 PM"],                       rating: 4.6, hospital: "Nabha Civil Hospital", fee: "₹220", image: "👩‍⚕️", queue: 1 },
+  { id: 9,  name: "Dr. Suresh Kumar",     specialization: "Psychiatry",         experience: "9 years",  available: false, availableDays: ["Wednesday","Saturday"],                    timeSlots: ["10:00 AM","12:00 PM","03:00 PM"],                       rating: 4.5, hospital: "Nabha Civil Hospital", fee: "₹300", image: "👨‍⚕️", queue: 0 },
+  { id: 10, name: "Dr. Anjali Mishra",    specialization: "Radiology",          experience: "13 years", available: true,  availableDays: ["Monday","Thursday","Friday"],              timeSlots: ["09:00 AM","11:00 AM","02:00 PM"],                       rating: 4.7, hospital: "Nabha Civil Hospital", fee: "₹280", image: "👩‍⚕️", queue: 2 },
+  { id: 11, name: "Dr. Balwinder Singh",  specialization: "Neurology",          experience: "16 years", available: true,  availableDays: ["Tuesday","Wednesday","Friday"],            timeSlots: ["10:00 AM","11:00 AM","02:00 PM","04:00 PM"],             rating: 4.8, hospital: "Nabha Civil Hospital", fee: "₹320", image: "👨‍⚕️", queue: 3 },
 ]
 
 
@@ -115,7 +120,7 @@ export default function Consultation() {
     const docName = selectedDoctor?.name.replace(/[^a-zA-Z]/g, "") || "Doctor"
     const patName = patientName.replace(/[^a-zA-Z]/g, "") || "Patient"
     const slot = selectedDay.replace(/[^a-zA-Z]/g, "") + selectedTime.replace(/[^a-zA-Z0-9]/g, "")
-    return `GramAarogya-${docName}-${patName}-${slot}`
+    return `GramCare-${docName}-${patName}-${slot}`
   }
 
   const getJitsiLink = () => `https://meet.jit.si/${getJitsiRoomName()}`

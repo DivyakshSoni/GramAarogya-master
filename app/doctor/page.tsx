@@ -24,7 +24,7 @@ function getJitsiRoom(doctorName: string, patientName: string, day: string, time
   const doc = doctorName.replace(/[^a-zA-Z]/g, "")
   const pat = patientName.replace(/[^a-zA-Z]/g, "")
   const slot = day.replace(/[^a-zA-Z]/g, "") + time.replace(/[^a-zA-Z0-9]/g, "")
-  return `GramAarogya-${doc}-${pat}-${slot}`
+  return `GramCare-${doc}-${pat}-${slot}`
 }
 
 export default function DoctorPortal() {
@@ -226,7 +226,7 @@ export default function DoctorPortal() {
                   <div className="mb-3">
                     <button
                       onClick={() => {
-                        const msg = `Namaste ${appt.patient_name} ji! 🙏\n\nYour teleconsultation with ${doctor?.name} (${appt.specialization}) is confirmed for ${appt.day} at ${appt.time}.\n\nPlease click the link below at your appointment time to join the video call:\n👉 https://meet.jit.si/${room}\n\n— Nabha Civil Hospital, GramAarogya`
+                        const msg = `Namaste ${appt.patient_name} ji! 🙏\n\nYour teleconsultation with ${doctor?.name} (${appt.specialization}) is confirmed for ${appt.day} at ${appt.time}.\n\nPlease click the link below at your appointment time to join the video call:\n👉 https://meet.jit.si/${room}\n\n— Nabha Civil Hospital, GramCare`
                         window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank")
                       }}
                       className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-500 text-white py-2.5 rounded-lg font-semibold text-sm"

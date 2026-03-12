@@ -8,46 +8,46 @@ import { Github, Linkedin, Mail, User, UserCircle } from "lucide-react"
 
 const teamMembers = [
   {
-    name: "Siddharth Mishra",
-    role: "AI Developer",
-    bio: "Siddharth is a skilled AI developer with expertise in deep learning and natural language processing. He specializes in building AI-driven solutions for healthcare and automation.",
-    links: {
-      github: "https://github.com/Sid3503",
-      linkedin: "https://www.linkedin.com/in/siddharth-mishra-0a5227228/",
-      email: "mishrasiddharth072@gmail.com",
-    },
-  },
-  {
-    name: "Manoday Kadam",
-    role: "AI Developer & Cloud Specialist",
-    bio: "Manoday is an AI developer with a strong background in cloud computing and scalable AI solutions. He excels in deploying AI models on cloud platforms for efficient real-world applications.",
-    links: {
-      github: "https://github.com/Manoday10",
-      linkedin: "https://www.linkedin.com/in/manoday-kadam-3b1a74268/",
-      email: "manodaykadam105@gmail.com",
-    },
-  },
-  {
-    name: "Prachiti Palande",
-    role: "UI/UX Specialist",
-    bio: "Prachiti is a creative UI/UX designer who focuses on crafting intuitive and engaging user experiences. She ensures that AI-powered applications are accessible and user-friendly.",
-    links: {
-      github: "https://github.com/mikejohnson",
-      linkedin: "https://linkedin.com/in/mikejohnson",
-      email: "prachitipalande191@gmail.com",
-    },
-  },
-  {
-    name: "Priyadarshini Chavan",
+    name: "Divyaksh Soni",
     role: "Frontend Designer & ML Specialist",
-    bio: "Priyadarshini is a frontend designer with a strong grasp of machine learning. She bridges the gap between AI models and user interfaces, ensuring seamless integration and performance.",
+    bio: "Divyaksh is a frontend designer with a strong grasp of machine learning. She bridges the gap between AI models and user interfaces, ensuring seamless integration and performance.",
     links: {
-      github: "https://github.com/Priyadarshini75",
-      linkedin: "https://www.linkedin.com/in/priyadarshinii/",
-      email: "priyadarshinichavan75@gmail.com",
+      github: "https://github.com/DivyakshSoni",
+      linkedin: "https://www.linkedin.com/in/divyaksh-soni/",
+      email: "devsoni1209@gmail.com",
     },
   },
-]
+  {
+    name: "Ganesh Sargar",
+    role: "UI/UX Specialist",
+    bio: "Ganesh is a creative UI/UX designer who focuses on crafting intuitive and engaging user experiences. He ensures that AI-powered applications are accessible and user-friendly.",
+    links: {
+      github: "https://github.com/ganeshsargar",
+      linkedin: "https://www.linkedin.com/in/ganesh-sargar/",
+      email: "sargarganesh0211@gmail.com",
+    },
+  },
+  {
+    name: "Prashant Singh",
+    role: "AI Developer & Cloud Specialist",
+    bio: "Prashant is an AI developer with a strong background in cloud computing and scalable AI solutions. He excels in deploying AI models on cloud platforms for efficient real-world applications.",
+    links: {
+      github: "https://github.com/prashantsingh30",
+      linkedin: "https://www.linkedin.com/in/prashant-suresh-singh/",
+      email: "singhprashantsuresh@gmail.com",
+    },
+  },
+  {
+    name: "Rakesh Sahu",
+    role: "AI Developer",
+    bio: "Rakesh is a skilled AI developer with expertise in deep learning and natural language processing. He specializes in building AI-driven solutions for healthcare and automation.",
+    links: {
+      github: "https://github.com/RakeshSahu24",
+      linkedin: "https://www.linkedin.com/in/rakeshsahu24/",
+      email: "rakesh.sahu888444@gmail.com",
+    },
+  },
+];
 
 const TeamMember = ({ member, index }) => {
   return (
@@ -125,7 +125,7 @@ export default function OurTeam() {
         >
           <h2 className="text-2xl font-semibold mb-4 pt-10">Our Vision</h2>
           <p className="text-gray-400">
-            At GramAarogya, we envision a world where quality healthcare is accessible to everyone, regardless of their
+            At GramCare, we envision a world where quality healthcare is accessible to everyone, regardless of their
             location or economic status. Our mission is to leverage cutting-edge technology to bridge the gap between
             rural communities and healthcare professionals, ensuring that every individual has access to timely and
             effective medical advice and support.
