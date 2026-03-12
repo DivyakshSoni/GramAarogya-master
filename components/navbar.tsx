@@ -59,19 +59,19 @@ export default function Navbar() {
         {/* Desktop Navbar Links — PS-aligned only */}
         <nav className="hidden sm:flex flex-1 items-center justify-center space-x-4 sm:space-x-6 text-sm font-medium">
           <Link href="/health-check" className="transition-colors hover:text-primary">
-            AarogyaMitraAI
+            {t.healthCheck}
           </Link>
           <Link href="/consultation" className="transition-colors hover:text-primary">
-            AarogyaConsult
+            {t.consult}
           </Link>
           <Link href="/health-records" className="transition-colors hover:text-primary">
-            AarogyaRecords
+            {t.records}
           </Link>
           <Link href="/medicine" className="transition-colors hover:text-primary">
-            AarogyaMeds
+            {t.meds}
           </Link>
           <Link href="/medicine-stock" className="transition-colors hover:text-primary">
-            HospitalStock
+            {lang === "hi" ? "अस्पताल स्टॉक" : "HospitalStock"}
           </Link>
         </nav>
 
@@ -93,19 +93,19 @@ export default function Navbar() {
               className="absolute top-12 left-1/2 transform -translate-x-1/2 w-[90%] bg-gray-900 shadow-lg rounded-lg text-center py-3 border border-gray-700 z-50"
             >
               <Link href="/health-check" className="block py-2 text-base font-medium hover:text-primary transition" onClick={() => setDropdownOpen(false)}>
-                AarogyaMitraAI
+                {t.healthCheck}
               </Link>
               <Link href="/consultation" className="block py-2 text-base font-medium hover:text-primary transition" onClick={() => setDropdownOpen(false)}>
-                AarogyaConsult
+                {t.consult}
               </Link>
               <Link href="/health-records" className="block py-2 text-base font-medium hover:text-primary transition" onClick={() => setDropdownOpen(false)}>
-                AarogyaRecords
+                {t.records}
               </Link>
               <Link href="/medicine" className="block py-2 text-base font-medium hover:text-primary transition" onClick={() => setDropdownOpen(false)}>
-                AarogyaMeds
+                {t.meds}
               </Link>
               <Link href="/medicine-stock" className="block py-2 text-base font-medium hover:text-primary transition" onClick={() => setDropdownOpen(false)}>
-                HospitalStock
+                {lang === "hi" ? "अस्पताल स्टॉक" : "HospitalStock"}
               </Link>
             </div>
           )}
