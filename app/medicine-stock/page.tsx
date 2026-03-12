@@ -173,9 +173,7 @@ export default function MedicineStock() {
                       <span className={`text-xs px-2 py-0.5 rounded-full border ${statusBadge(med.status)}`}>
                         {statusLabel(med.status)}
                       </span>
-                      {med.status !== "out" && (
-                        <p className="text-xs text-gray-600 mt-1">{med.quantity} units</p>
-                      )}
+
                     </div>
                   </div>
                 </div>
