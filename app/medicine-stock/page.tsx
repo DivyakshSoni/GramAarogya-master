@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { Search, CheckCircle2, XCircle, AlertCircle, RefreshCw, Building2 } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
+import { useLang } from "@/components/lang-context"
 
 interface MedicineStock {
   name: string
@@ -40,6 +41,7 @@ const STOCK_DATA: MedicineStock[] = [
 const CATEGORIES = ["All", "General", "Antibiotic", "Diabetes", "Cardiovascular", "Gastro", "Allergy", "Respiratory", "Maternal", "Malaria"]
 
 export default function MedicineStock() {
+  const { t, lang } = useLang()
   const [search, setSearch] = useState("")
   const [category, setCategory] = useState("All")
   const [lastRefreshed, setLastRefreshed] = useState("")
@@ -73,9 +75,9 @@ export default function MedicineStock() {
   }
 
   const statusLabel = (status: MedicineStock["status"]) => {
-    if (status === "available") return "In Stock"
-    if (status === "low") return "Low Stock"
-    return "Out of Stock"
+    if (status === "available") return t.stockInStock
+    if (status === "low") return t.stockLowStock
+    return t.stockOutStock
   }
 
   return (
@@ -89,16 +91,16 @@ export default function MedicineStock() {
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <Building2 size={20} className="text-blue-400" />
-                <h1 className="text-xl sm:text-2xl font-bold">Nabha Civil Hospital</h1>
-                <span className="text-xs px-2 py-0.5 bg-green-900/40 text-green-300 border border-green-800 rounded-full">Live</span>
+                <h1 className="text-xl sm:text-2xl font-bold">{lang === "hi" ? "नभा सिविल अस्पताल" : "Nabha Civil Hospital"}</h1>
+                <span className="text-xs px-2 py-0.5 bg-green-900/40 text-green-300 border border-green-800 rounded-full">{lang === "hi" ? "लाइव" : "Live"}</span>
               </div>
-              <p className="text-gray-400 text-sm">Pharmacy Medicine Stock — Updated: {lastRefreshed}</p>
+              <p className="text-gray-400 text-sm">{lang === "hi" ? `फार्मेसी दवा स्टॉक — अपडेट: ${lastRefreshed}` : `Pharmacy Medicine Stock — Updated: ${lastRefreshed}`}</p>
             </div>
             <button
               onClick={() => window.location.reload()}
               className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500 px-3 py-2 rounded-lg transition"
             >
-              <RefreshCw size={14} /> Refresh Stock
+              <RefreshCw size={14} /> {t.stockRefresh}
             </button>
           </div>
 
@@ -106,15 +108,15 @@ export default function MedicineStock() {
           <div className="grid grid-cols-3 gap-3 mt-4">
             <div className="bg-green-900/20 border border-green-800/50 rounded-lg p-3 text-center">
               <p className="text-xl font-bold text-green-400">{STOCK_DATA.filter(m => m.status === "available").length}</p>
-              <p className="text-xs text-gray-400">Available</p>
+              <p className="text-xs text-gray-400">{t.stockAvailable}</p>
             </div>
             <div className="bg-yellow-900/20 border border-yellow-800/50 rounded-lg p-3 text-center">
               <p className="text-xl font-bold text-yellow-400">{STOCK_DATA.filter(m => m.status === "low").length}</p>
-              <p className="text-xs text-gray-400">Low Stock</p>
+              <p className="text-xs text-gray-400">{t.stockLow}</p>
             </div>
             <div className="bg-red-900/20 border border-red-800/50 rounded-lg p-3 text-center">
               <p className="text-xl font-bold text-red-400">{STOCK_DATA.filter(m => m.status === "out").length}</p>
-              <p className="text-xs text-gray-400">Out of Stock</p>
+              <p className="text-xs text-gray-400">{t.stockOut}</p>
             </div>
           </div>
         </div>
@@ -129,7 +131,7 @@ export default function MedicineStock() {
               type="text"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Search medicine name..."
+              placeholder={t.stockSearch}
               className="w-full pl-9 pr-4 py-2.5 rounded-lg bg-gray-900 border border-gray-700 text-white text-sm"
             />
           </div>
@@ -149,7 +151,7 @@ export default function MedicineStock() {
             ))}
           </div>
           <p className="text-xs text-gray-600">
-            Showing {filtered.length} medicines • {available} available • {low} low • {outOfStock} out
+            {lang === "hi" ? `${filtered.length} दवाएं दिख रही हैं • ${available} उपलब्ध • ${low} कम • ${outOfStock} खत्म` : `Showing ${filtered.length} medicines • ${available} available • ${low} low • ${outOfStock} out`}
           </p>
         </div>
       </div>
@@ -184,13 +186,13 @@ export default function MedicineStock() {
           {/* Out of stock alert */}
           {outOfStock > 0 && (
             <div className="mt-4 bg-orange-900/20 border border-orange-800/50 rounded-lg p-4 text-sm">
-              <p className="text-orange-300 font-medium mb-1">⚠️ {outOfStock} medicines currently out of stock</p>
+              <p className="text-orange-300 font-medium mb-1">⚠️ {lang === "hi" ? `${outOfStock} दवाएं अभी स्टॉक में नहीं` : `${outOfStock} medicines currently out of stock`}</p>
               <p className="text-gray-400 text-xs">
-                If your prescribed medicine is out of stock here, use{" "}
+                {lang === "hi" ? "अगर आपकी दवा यहाँ नहीं है, तो" : "If your prescribed medicine is out of stock here, use"}{" "}
                 <button onClick={() => router.push("/medicine")} className="text-blue-400 underline">
-                  AarogyaMeds
+                  {t.meds}
                 </button>{" "}
-                to find it at nearby pharmacies.
+                {lang === "hi" ? "से नजदीकी फार्मेसी में खोजें।" : "to find it at nearby pharmacies."}
               </p>
             </div>
           )}
@@ -200,7 +202,7 @@ export default function MedicineStock() {
       <div className="bg-black pb-6 px-4">
         <div className="max-w-5xl mx-auto">
           <Button variant="outline" className="hover:bg-[#b9b9b9]" onClick={() => router.push("/")}>
-            Back to Home
+            {t.backHome}
           </Button>
         </div>
       </div>

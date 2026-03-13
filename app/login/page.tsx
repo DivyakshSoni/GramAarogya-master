@@ -1,10 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Heart, User, Stethoscope, Eye, EyeOff, Phone, Lock, ArrowRight } from "lucide-react"
 import Link from "next/link"
+import { useLang } from "@/components/lang-context"
 
 const API = "http://127.0.0.1:5000"
 
@@ -12,11 +13,33 @@ type Mode = "choose" | "login" | "register"
 
 export default function LoginPage() {
   const router = useRouter()
+  const { t, lang } = useLang()
   const [mode, setMode] = useState<Mode>("choose")
   const [role, setRole] = useState<"patient" | "doctor">("patient")
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+
+  // ── If already logged in, skip login screen; else clear ALL stale data ──
+  useEffect(() => {
+    const raw = localStorage.getItem("gramaarogya_user")
+    if (raw) {
+      // Already logged in — send to the right portal
+      const u = JSON.parse(raw)
+      if (u.role === "doctor") router.replace("/doctor")
+      else router.replace("/health-check")
+    } else {
+      // No valid session — wipe ALL stale offline data so health-records can't be accessed
+      const staleKeys = [
+        "gramcare_user",
+        "patientProfile",
+        "healthRecords",
+        "appointments",
+      ]
+      staleKeys.forEach(k => localStorage.removeItem(k))
+    }
+  }, [router])
+
 
   // Login fields
   const [phone, setPhone] = useState("")
@@ -45,6 +68,17 @@ export default function LoginPage() {
       })
       const data = await res.json()
       if (!res.ok) { setError(data.error || "Login failed"); return }
+
+      // ── Role mismatch guard ─────────────────────────────
+      if (data.user.role !== role) {
+        const expected = data.user.role === "doctor" ? "Doctor" : "Patient"
+        const chosen   = role === "doctor" ? "Doctor" : "Patient"
+        setError(
+          `This account is registered as a ${expected}. Please use the ${expected} login option, not ${chosen}.`
+        )
+        return
+      }
+
       saveUser(data.user)
       router.push(data.user.role === "doctor" ? "/doctor" : "/health-check")
     } catch {
@@ -88,9 +122,9 @@ export default function LoginPage() {
             </div>
           </div>
           <h1 className="text-3xl font-extrabold text-white mb-1">GramCare</h1>
-          <p className="text-gray-400 text-sm mb-10">Rural TeleHealth Access System</p>
+          <p className="text-gray-400 text-sm mb-10">{t.loginTitle}</p>
 
-          <p className="text-gray-300 font-medium mb-4">I am a...</p>
+          <p className="text-gray-300 font-medium mb-4">{lang === "hi" ? "मैं एक..." : "I am a..."}</p>
 
           <div className="grid grid-cols-2 gap-4 mb-6">
             <button
@@ -98,16 +132,16 @@ export default function LoginPage() {
               className="bg-gray-900 border-2 border-gray-700 hover:border-blue-500 rounded-2xl p-6 text-center transition-all group"
             >
               <User size={32} className="mx-auto mb-3 text-blue-400 group-hover:scale-110 transition" />
-              <p className="font-semibold text-white">Patient</p>
-              <p className="text-xs text-gray-500 mt-1">Consult, check symptoms, medicines</p>
+              <p className="font-semibold text-white">{t.loginPatient}</p>
+              <p className="text-xs text-gray-500 mt-1">{lang === "hi" ? "परामर्श, लक्षण जाँच, दवाइयाँ" : "Consult, check symptoms, medicines"}</p>
             </button>
             <button
               onClick={() => { setRole("doctor"); setMode("login") }}
               className="bg-gray-900 border-2 border-gray-700 hover:border-green-500 rounded-2xl p-6 text-center transition-all group"
             >
               <Stethoscope size={32} className="mx-auto mb-3 text-green-400 group-hover:scale-110 transition" />
-              <p className="font-semibold text-white">Doctor</p>
-              <p className="text-xs text-gray-500 mt-1">Manage consultations, prescriptions</p>
+              <p className="font-semibold text-white">{t.loginDoctor}</p>
+              <p className="text-xs text-gray-500 mt-1">{lang === "hi" ? "परामर्श, पर्चे प्रबंधित करें" : "Manage consultations, prescriptions"}</p>
             </button>
           </div>
 

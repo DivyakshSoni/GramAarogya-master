@@ -1,17 +1,19 @@
 import Link from "next/link"
 import { Github, Twitter, Linkedin } from "lucide-react"
+import { useLang } from "@/components/lang-context"
 
 export default function Footer() {
+  const { t } = useLang()
   return (
     <footer className="border-t">
       <div className="container flex flex-col gap-8 py-8 md:flex-row md:py-12">
         <div className="flex-1 space-y-4">
           <h2 className="font-bold">GramCare</h2>
-          <p className="text-sm text-muted-foreground">Revolutionizing Rural Healthcare</p>
+          <p className="text-sm text-muted-foreground">{t.footerTagline}</p>
         </div>
         <div className="grid flex-1 grid-cols-2 gap-12 sm:grid-cols-3">
           <div className="space-y-4">
-            <h3 className="text-sm font-medium">Solutions</h3>
+            <h3 className="text-sm font-medium">{t.footerSolutions}</h3>
             <ul className="space-y-3 text-sm">
               <li>
                 <Link href="/health-check" className="text-muted-foreground transition-colors hover:text-primary">
@@ -41,7 +43,7 @@ export default function Footer() {
             </ul>
           </div>
           <div className="space-y-4">
-            <h3 className="text-sm font-medium">Company</h3>
+            <h3 className="text-sm font-medium">{t.footerCompany}</h3>
             <ul className="space-y-3 text-sm">
               <li>
                 <Link href="/our-team" className="text-muted-foreground transition-colors hover:text-primary">
@@ -51,7 +53,7 @@ export default function Footer() {
             </ul>
           </div>
           <div className="space-y-4">
-            <h3 className="text-sm font-medium">Connect</h3>
+            <h3 className="text-sm font-medium">{t.footerConnect}</h3>
             <div className="flex space-x-4">
               <Link
                 href="https://github.com/Sid3503"

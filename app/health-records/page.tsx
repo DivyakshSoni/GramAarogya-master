@@ -47,6 +47,7 @@ interface Appointment {
 }
 
 export default function HealthRecords() {
+  const [authChecked, setAuthChecked] = useState(false)   // ← blocks render until auth verified
   const [isRegistered, setIsRegistered] = useState(false)
   const [profile, setProfile] = useState<PatientProfile | null>(null)
   const [records, setRecords] = useState<HealthRecord[]>([])
@@ -75,77 +76,87 @@ export default function HealthRecords() {
 
   const API = "http://127.0.0.1:5000"
 
-  // Load data — try SQLite backend first, fall back to localStorage (offline)
+  // ── Auth guard — runs before first paint renders content ──────────
   useEffect(() => {
     const sessionRaw = localStorage.getItem("gramaarogya_user")
 
-    if (sessionRaw) {
-      const u = JSON.parse(sessionRaw)
-
-      // Build profile from session immediately into React state
-      const existingProfileRaw = localStorage.getItem("patientProfile")
-      const autoProfile: PatientProfile = existingProfileRaw
-        ? JSON.parse(existingProfileRaw)
-        : {
-            name: u.name, age: u.age?.toString() || "", gender: "Male",
-            phone: u.phone, village: u.village || "", bloodGroup: u.bloodGroup || "",
-            allergies: "", emergencyContact: "", registeredAt: new Date().toISOString(),
-          }
-
-      if (!existingProfileRaw) {
-        localStorage.setItem("patientProfile", JSON.stringify(autoProfile))
-      }
-
-      // Directly set profile & mark as registered — no registration form needed
-      setProfile(autoProfile)
-      setIsRegistered(true)
-
-      // Fetch from SQLite; fall back to localStorage on failure (offline)
-      const fetchFromDB = async () => {
-        try {
-          const [recRes, apptRes] = await Promise.all([
-            fetch(`${API}/health-records/${u.id}`),
-            fetch(`${API}/appointments/${u.id}`),
-          ])
-          if (recRes.ok) {
-            const { records: dbRec } = await recRes.json()
-            setRecords(dbRec.map((r: Record<string, string>) => ({
-              id: r.id, date: r.date, type: (r.type || "consultation") as HealthRecord["type"],
-              doctorName: r.doctor || "", diagnosis: r.details || "",
-              prescription: "", notes: "",
-            })))
-          } else {
-            const saved = localStorage.getItem("healthRecords")
-            if (saved) setRecords(JSON.parse(saved))
-          }
-          if (apptRes.ok) {
-            const { appointments: dbAppt } = await apptRes.json()
-            setAppointments(dbAppt.map((a: Record<string, string>) => ({
-              id: a.id, doctorName: a.doctor_name, specialization: a.specialization,
-              hospital: a.hospital, day: a.day, time: a.time,
-              patientName: a.patient_name, patientPhone: "",
-              symptoms: a.symptoms || "", status: a.status, bookedAt: a.booked_at,
-            })))
-          } else {
-            const saved = localStorage.getItem("appointments")
-            if (saved) setAppointments(JSON.parse(saved))
-          }
-        } catch {
-          // Offline — use localStorage
-          const savedRec = localStorage.getItem("healthRecords")
-          if (savedRec) setRecords(JSON.parse(savedRec))
-          const savedAppt = localStorage.getItem("appointments")
-          if (savedAppt) setAppointments(JSON.parse(savedAppt))
-        }
-      }
-      fetchFromDB()
-      return // skip localStorage-only path below
+    if (!sessionRaw) {
+      // No session — wipe stale data and send to login
+      localStorage.removeItem("patientProfile")
+      router.replace("/login")
+      return
     }
 
-    // No valid login session — clear stale data and redirect to login
-    localStorage.removeItem("patientProfile")
-    router.replace("/login")
+    const u = JSON.parse(sessionRaw)
+
+    // Doctor trying to access patient records → send to doctor portal
+    if (u.role === "doctor") {
+      router.replace("/doctor")
+      return
+    }
+
+    // Valid patient session — build profile
+    const existingProfileRaw = localStorage.getItem("patientProfile")
+    const autoProfile: PatientProfile = existingProfileRaw
+      ? JSON.parse(existingProfileRaw)
+      : {
+          name: u.name, age: u.age?.toString() || "", gender: "Male",
+          phone: u.phone, village: u.village || "", bloodGroup: u.bloodGroup || "",
+          allergies: "", emergencyContact: "", registeredAt: new Date().toISOString(),
+        }
+
+    if (!existingProfileRaw) {
+      localStorage.setItem("patientProfile", JSON.stringify(autoProfile))
+    }
+
+    setProfile(autoProfile)
+    setIsRegistered(true)
+    setAuthChecked(true)  // ← only now allow the page to render
+
+    // Fetch from SQLite; fall back to localStorage on failure (offline)
+    const fetchFromDB = async () => {
+      try {
+        const [recRes, apptRes] = await Promise.all([
+          fetch(`${API}/health-records/${u.id}`),
+          fetch(`${API}/appointments/${u.id}`),
+        ])
+        if (recRes.ok) {
+          const { records: dbRec } = await recRes.json()
+          setRecords(dbRec.map((r: Record<string, string>) => ({
+            id: r.id, date: r.date, type: (r.type || "consultation") as HealthRecord["type"],
+            doctorName: r.doctor || "", diagnosis: r.details || "",
+            prescription: "", notes: "",
+          })))
+        } else {
+          const saved = localStorage.getItem("healthRecords")
+          if (saved) setRecords(JSON.parse(saved))
+        }
+        if (apptRes.ok) {
+          const { appointments: dbAppt } = await apptRes.json()
+          setAppointments(dbAppt.map((a: Record<string, string>) => ({
+            id: a.id, doctorName: a.doctor_name, specialization: a.specialization,
+            hospital: a.hospital, day: a.day, time: a.time,
+            patientName: a.patient_name, patientPhone: "",
+            symptoms: a.symptoms || "", status: a.status, bookedAt: a.booked_at,
+          })))
+        } else {
+          const saved = localStorage.getItem("appointments")
+          if (saved) setAppointments(JSON.parse(saved))
+        }
+      } catch {
+        // Offline — use localStorage
+        const savedRec = localStorage.getItem("healthRecords")
+        if (savedRec) setRecords(JSON.parse(savedRec))
+        const savedAppt = localStorage.getItem("appointments")
+        if (savedAppt) setAppointments(JSON.parse(savedAppt))
+      }
+    }
+    fetchFromDB()
   }, [router])
+
+  // Block render completely until auth is confirmed
+  if (!authChecked) return null
+
 
   const handleRegister = () => {
     if (!regName || !regAge || !regPhone || !regVillage) return

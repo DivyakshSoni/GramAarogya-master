@@ -2,8 +2,9 @@
 
 import Link from "next/link"
 import { useEffect, useState } from "react"
-import { ChevronDown, ChevronUp } from "lucide-react"
+import { ChevronDown, ChevronUp, LogOut } from "lucide-react"
 import { useLang } from "@/components/lang-context"
+import { useRouter } from "next/navigation"
 
 const translations = [
   { lang: "English", text: "GramCare" },
@@ -27,7 +28,9 @@ export default function Navbar() {
   const [indexLeft, setIndexLeft] = useState(0)
   const [indexRight, setIndexRight] = useState(0)
   const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [sessionUser, setSessionUser] = useState<{ name: string; role: string } | null>(null)
   const { lang, setLang, t } = useLang()
+  const router = useRouter()
 
   useEffect(() => {
     const intervalLeft = setInterval(() => {
@@ -43,6 +46,31 @@ export default function Navbar() {
       clearInterval(intervalRight)
     }
   }, [])
+
+  // Read session on mount and whenever storage changes
+  useEffect(() => {
+    const read = () => {
+      const raw = localStorage.getItem("gramaarogya_user")
+      setSessionUser(raw ? JSON.parse(raw) : null)
+    }
+    read()
+    window.addEventListener("storage", read)
+    return () => window.removeEventListener("storage", read)
+  }, [])
+
+  const handleLogout = () => {
+    // Wipe ALL session and patient data from localStorage
+    const keysToRemove = [
+      "gramaarogya_user",
+      "gramcare_user",
+      "patientProfile",
+      "healthRecords",
+      "appointments",
+    ]
+    keysToRemove.forEach(k => localStorage.removeItem(k))
+    setSessionUser(null)
+    router.push("/login")
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur-lg">
@@ -120,12 +148,26 @@ export default function Navbar() {
           >
             {lang === "en" ? "🌐 हिं" : "🌐 EN"}
           </button>
-          <Link
-            href="/login"
-            className="text-xs px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-full font-medium transition hidden sm:block"
-          >
-            Login
-          </Link>
+          {sessionUser && sessionUser.role === "patient" ? (
+            <div className="hidden sm:flex items-center gap-2">
+              <span className="text-xs text-gray-300 font-medium">
+                👤 {sessionUser.name.split(" ")[0]}
+              </span>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-1 text-xs px-3 py-1.5 bg-red-700 hover:bg-red-600 text-white rounded-full font-medium transition"
+              >
+                <LogOut size={12} /> {lang === "hi" ? "लॉगआउट" : "Logout"}
+              </button>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="text-xs px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-full font-medium transition hidden sm:block"
+            >
+              {lang === "hi" ? "लॉगिन" : "Login"}
+            </Link>
+          )}
           <span className="text-lg font-bold italic transition-all duration-1000 sm:text-xl lg:text-2xl">
             {greetings[indexRight].text}
           </span>
